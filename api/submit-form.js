@@ -6,22 +6,41 @@ export default async function handler(req, res) {
   const { Name, Email, Message } = req.body;
 
   try {
-    const response = await fetch(`https://api.airtable.com/v0/${process.env.AIRTABLE_BASE_ID}/${process.env.AIRTABLE_TABLE_NAME}`, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${process.env.AIRTABLE_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        fields: {
-          Name,
-          Email,
-          Message,
+    const response = await fetch(
+      `https://api.airtable.com/v0/${process.env.AIRTABLE_BASE_ID}/${process.env.AIRTABLE_TABLE_NAME}`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${process.env.AIRTABLE_API_KEY}`,
+          "Content-Type": "application/json",
         },
-      }),
+        body: JSON.stringify({
+          fields: { Name, Email, Message },
+        }),
+      }
+    );
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      return res.status(response.status).json({
+        message: "Airtable error",
+        error: errorText,
+      });
+    }
+
+    const result = await response.json();
+
+    // ✅ Send a success response so frontend doesn't error
+    return res.status(200).json({
+      success: true,
+      message: "Form submitted successfully!",
+      record: result,
     });
 
   } catch (err) {
-    res.status(500).json({ message: "Error submitting form", error: err.message });
+    console.error("Error submitting to Airtable:", err);
+    return res
+      .status(500)
+      .json({ message: "Error submitting form", error: err.message });
   }
 }
