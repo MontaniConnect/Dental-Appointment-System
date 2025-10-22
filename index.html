@@ -100,6 +100,7 @@
                 <div class="margin-top margin-medium">
                   <div class="header-form-block w-form">
                     <form id="contactForm" name="wf-form-Application-Form" data-name="Application Form" method="get" class="header-form" data-wf-page-id="67b41f179b7c6c2bcbd89696" data-wf-element-id="c8735125-517d-e9fa-2504-865350872df6"><input class="footer-text-field w-input" maxlength="256" name="Name" data-name="Name" placeholder="Name" type="text" id="Name-4" required=""><input class="footer-text-field w-input" maxlength="256" name="Email" data-name="Email" placeholder="Enter your email" type="email" id="Email" required=""><input class="footer-text-field w-input" maxlength="256" name="Message" data-name="Message" placeholder="Message" type="text" id="Message" required=""><input type="submit" data-wait="Please wait..." class="button header-form-submit w-button" value="Get free guide">
+                      <div class="form-message" style="display:none;"></div>
                       <div class="w-embed w-script">
                       </div>
                     </form>
@@ -107,9 +108,17 @@
                         <script>
 document.getElementById("contactForm").addEventListener("submit", async (e) => {
   e.preventDefault();
-  e.stopPropagation(); // prevents Webflow default submission
+  e.stopPropagation(); // stop Webflow’s built-in form submission
 
-  const formData = Object.fromEntries(new FormData(e.target));
+  const form = e.target;
+  const formData = Object.fromEntries(new FormData(form));
+
+  // Select message area (same container as error)
+  const messageBox = document.querySelector(".form-message");
+
+  // Clear previous message
+  messageBox.style.display = "none";
+  messageBox.textContent = "";
 
   try {
     const res = await fetch("/api/submit-form", {
@@ -121,15 +130,38 @@ document.getElementById("contactForm").addEventListener("submit", async (e) => {
     const data = await res.json().catch(() => ({}));
 
     if (res.ok) {
-      // Hide error, show success (Webflow style)
-      document.querySelector(".w-form-fail").style.display = "none";
-      document.querySelector(".w-form-done").style.display = "block";
-      e.target.reset();
+      // ✅ Show success message
+      messageBox.style.display = "block";
+      messageBox.style.background = "#E6F4EA";
+      messageBox.style.color = "#0F5132";
+      messageBox.style.border = "1px solid #A3CFBB";
+      messageBox.style.padding = "10px";
+      messageBox.style.borderRadius = "6px";
+      messageBox.style.marginTop = "10px";
+      messageBox.textContent = "✅ Form submitted successfully!";
+
+      form.reset();
     } else {
-      document.querySelector(".w-form-fail").style.display = "block";
+      // ❌ Show error message
+      messageBox.style.display = "block";
+      messageBox.style.background = "#F8D7DA";
+      messageBox.style.color = "#842029";
+      messageBox.style.border = "1px solid #F5C2C7";
+      messageBox.style.padding = "10px";
+      messageBox.style.borderRadius = "6px";
+      messageBox.style.marginTop = "10px";
+      messageBox.textContent = "Oops! Something went wrong while submitting the form.";
     }
   } catch (err) {
-    document.querySelector(".w-form-fail").style.display = "block";
+    // ❌ Handle network or server errors
+    messageBox.style.display = "block";
+    messageBox.style.background = "#F8D7DA";
+    messageBox.style.color = "#842029";
+    messageBox.style.border = "1px solid #F5C2C7";
+    messageBox.style.padding = "10px";
+    messageBox.style.borderRadius = "6px";
+    messageBox.style.marginTop = "10px";
+    messageBox.textContent = "Network error. Please try again later.";
   }
 });
 
