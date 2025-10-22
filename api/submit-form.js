@@ -21,6 +21,10 @@ export default async function handler(req, res) {
       }),
     });
 
+    if (!response.ok) throw new Error("Airtable API error");
 
-  } 
+    res.status(200).json({ message: "Success! Record added to Airtable." });
+  } catch (err) {
+    res.status(500).json({ message: "Error submitting form", error: err.message });
+  }
 }
