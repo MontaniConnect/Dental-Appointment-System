@@ -107,6 +107,8 @@
                         <script>
 document.getElementById("contactForm").addEventListener("submit", async (e) => {
   e.preventDefault();
+  e.stopPropagation(); // prevents Webflow default submission
+
   const formData = Object.fromEntries(new FormData(e.target));
 
   try {
@@ -119,14 +121,18 @@ document.getElementById("contactForm").addEventListener("submit", async (e) => {
     const data = await res.json().catch(() => ({}));
 
     if (res.ok) {
-      alert(data.message || "Form submitted successfully!");
+      // Hide error, show success (Webflow style)
+      document.querySelector(".w-form-fail").style.display = "none";
+      document.querySelector(".w-form-done").style.display = "block";
+      e.target.reset();
     } else {
-      alert(data.message || "Something went wrong.");
+      document.querySelector(".w-form-fail").style.display = "block";
     }
   } catch (err) {
-    alert("Network error: " + err.message);
+    document.querySelector(".w-form-fail").style.display = "block";
   }
 });
+
 
 </script>
                     <div class="w-form-done">
