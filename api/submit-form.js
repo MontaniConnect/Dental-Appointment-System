@@ -3,7 +3,7 @@ export default async function handler(req, res) {
     return res.status(405).json({ message: "Method not allowed" });
   }
 
-  const { Name, Email, Message } = req.body;
+  const { Name, Email, Message, Service_Needed, Other, Time_Date, Age, Phone_Number, Address, Patient_Type, Source, Referred_By } = req.body;
 
   try {
     const response = await fetch(
@@ -15,7 +15,7 @@ export default async function handler(req, res) {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          fields: { Name, Email, Message },
+          fields: { Name, Email, Message, Service_Needed, Other, Time_Date, Age, Phone_Number, Address, Patient_Type, Source, Referred_By },
         }),
       }
     );
